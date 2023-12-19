@@ -36,9 +36,4 @@ public static class Extensions
 
         return value;
     }
-
-    public static bool IsBetween(this float value, float min, float max)
-    {
-        return value >= min && value <= max;
-    }
 }

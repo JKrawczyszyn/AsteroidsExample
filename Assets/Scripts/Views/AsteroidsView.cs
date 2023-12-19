@@ -64,9 +64,9 @@ public class AsteroidsView : MonoBehaviour
         var shipPositionX = (int)_shipModel.Position.x;
         var shipPositionY = (int)_shipModel.Position.y;
 
-        for (int x = shipPositionX - _halfWidth; x <= shipPositionX + _halfWidth; x++)
+        for (int x = shipPositionX - _halfWidth; x < shipPositionX + _halfWidth; x++)
         {
-            for (int y = shipPositionY - _halfHeight; y <= shipPositionY + _halfHeight; y++)
+            for (int y = shipPositionY - _halfHeight; y < shipPositionY + _halfHeight; y++)
             {
                 var cellPosition = new Vector2Int(x, y);
                 var updated = UpdateCell(cellPosition);
@@ -90,13 +90,12 @@ public class AsteroidsView : MonoBehaviour
         var asteroids = _asteroidsController.GetAsteroidIdsInCell(cellPosition);
         foreach (int index in asteroids)
         {
-            Vector2 position = cellPosition + _asteroidsController.AsteroidLocalPosition(index) - _shipModel.Position;
+            Vector2 asteroidLocalPosition = _asteroidsController.AsteroidLocalPosition(index);
+            Vector2 position = cellPosition + asteroidLocalPosition - _shipModel.Position;
 
             if (_asteroids.TryGetValue(index, out GameObject go))
             {
                 go.transform.position = position;
-
-                yield return index;
             }
             else
             {
@@ -107,9 +106,9 @@ public class AsteroidsView : MonoBehaviour
                 text.text = cellPosition.ToString();
 
                 _asteroids.Add(index, instance);
-
-                yield return index;
             }
+
+            yield return index;
         }
     }
 }

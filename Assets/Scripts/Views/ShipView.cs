@@ -31,6 +31,6 @@ public class ShipView : MonoBehaviour
         }
 
         _ship.transform.rotation
-            = Quaternion.Euler(0, 0, Mathf.Atan2(_shipModel.Angle.y, _shipModel.Angle.x) * Mathf.Rad2Deg);
+            = Quaternion.Euler(0, 0, (Mathf.Atan2(_shipModel.Angle.y, _shipModel.Angle.x) * Mathf.Rad2Deg) - 90);
     }
 }

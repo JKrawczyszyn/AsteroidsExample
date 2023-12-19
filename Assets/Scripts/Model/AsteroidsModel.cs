@@ -53,7 +53,7 @@ public class AsteroidsModel
         _cellPositionsX[index] = cellPosition.x;
         _cellPositionsY[index] = cellPosition.y;
         _localPositionsX[index] = localPosition.x;
-        _localPositionsX[index] = localPosition.y;
+        _localPositionsY[index] = localPosition.y;
         _velocitiesX[index] = velocity.x;
         _velocitiesY[index] = velocity.y;
     }
