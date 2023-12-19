@@ -1,24 +1,32 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 public class AsteroidsModel
 {
-    private readonly CellModel[,] _cells;
+    public readonly int CellsWidth;
+    public readonly int CellsHeight;
 
     private readonly int[] _cellPositionsX, _cellPositionsY;
     private readonly float[] _localPositionsX, _localPositionsY;
     private readonly float[] _velocitiesX, _velocitiesY;
+    private readonly float[] _timeToSpawn;
+
+    private readonly CellModel[,] _cells;
 
     private int _currentId;
-
-    public int CellsWidth { get; }
-    public int CellsHeight { get; }
 
     public AsteroidsModel(int width, int height)
     {
         CellsWidth = width;
         CellsHeight = height;
+
+        _cellPositionsX = new int[width * height];
+        _cellPositionsY = new int[width * height];
+        _localPositionsX = new float[width * height];
+        _localPositionsY = new float[width * height];
+        _velocitiesX = new float[width * height];
+        _velocitiesY = new float[width * height];
+        _timeToSpawn = new float[width * height];
 
         _cells = new CellModel[width, height];
 
@@ -29,13 +37,6 @@ public class AsteroidsModel
                 _cells[x, y] = new CellModel();
             }
         }
-
-        _cellPositionsX = new int[width * height];
-        _cellPositionsY = new int[width * height];
-        _localPositionsX = new float[width * height];
-        _localPositionsY = new float[width * height];
-        _velocitiesX = new float[width * height];
-        _velocitiesY = new float[width * height];
 
         _currentId = 0;
     }
@@ -50,15 +51,15 @@ public class AsteroidsModel
         CellModel cellModel = GetCell(cellPosition);
         cellModel.AddAsteroid(index);
 
-        _cellPositionsX[index] = cellPosition.x;
-        _cellPositionsY[index] = cellPosition.y;
+        _cellPositionsX[index] = cellPosition.x.Wrap(CellsWidth);
+        _cellPositionsY[index] = cellPosition.y.Wrap(CellsHeight);
         _localPositionsX[index] = localPosition.x;
         _localPositionsY[index] = localPosition.y;
         _velocitiesX[index] = velocity.x;
         _velocitiesY[index] = velocity.y;
     }
 
-    public IEnumerable<int> GetAsteroidIdsInCell(Vector2Int position)
+    public int[] GetAsteroidIdsInCell(Vector2Int position)
     {
         return GetCell(position).Asteroids;
     }
@@ -82,49 +83,101 @@ public class AsteroidsModel
     {
         for (var i = 0; i < _currentId; i++)
         {
-            _localPositionsX[i] += _velocitiesX[i] * deltaTime;
-            _localPositionsY[i] += _velocitiesY[i] * deltaTime;
-
-            int x = _cellPositionsX[i];
-            int y = _cellPositionsY[i];
-            (int oldX, int oldY) = (x, y);
-
-            float localPositionX = _localPositionsX[i];
-            float localPositionY = _localPositionsY[i];
-
-            if (localPositionX < 0)
+            if (_timeToSpawn[i] > 0f)
             {
-                localPositionX += 1f;
-                x--;
-            }
-            else if (localPositionX >= 1f)
-            {
-                localPositionX -= 1f;
-                x++;
-            }
+                _timeToSpawn[i] -= deltaTime;
 
-            if (localPositionY < 0)
-            {
-                localPositionY += 1f;
-                y--;
-            }
-            else if (localPositionY >= 1f)
-            {
-                localPositionY -= 1f;
-                y++;
-            }
-
-            if (oldX == x && oldY == y)
                 continue;
+            }
 
-            _localPositionsX[i] = localPositionX;
-            _localPositionsY[i] = localPositionY;
+            UpdatePositions(i, deltaTime);
+
+            CheckCollisions(i);
+        }
+    }
+
+    private void UpdatePositions(int i, float deltaTime)
+    {
+        int x = _cellPositionsX[i];
+        int y = _cellPositionsY[i];
+        (int oldX, int oldY) = (x, y);
+
+        float localPositionX = _localPositionsX[i];
+        float localPositionY = _localPositionsY[i];
+
+        localPositionX += _velocitiesX[i] * deltaTime;
+        localPositionY += _velocitiesY[i] * deltaTime;
+
+        if (localPositionX < 0)
+        {
+            localPositionX += 1f;
+            x = (x - 1).Wrap(CellsWidth);
+        }
+        else if (localPositionX >= 1f)
+        {
+            localPositionX -= 1f;
+            x = (x + 1).Wrap(CellsWidth);
+        }
+
+        if (localPositionY < 0)
+        {
+            localPositionY += 1f;
+            y = (y - 1).Wrap(CellsHeight);
+        }
+        else if (localPositionY >= 1f)
+        {
+            localPositionY -= 1f;
+            y = (y + 1).Wrap(CellsHeight);
+        }
+
+        _localPositionsX[i] = localPositionX;
+        _localPositionsY[i] = localPositionY;
+
+        if (oldX != x || oldY != y)
+        {
             _cellPositionsX[i] = x;
             _cellPositionsY[i] = y;
 
-            GetCell(oldX, oldY).RemoveAsteroid(i);
-            GetCell(x, y).AddAsteroid(i);
+            _cells[oldX, oldY].RemoveAsteroid(i);
+            _cells[x, y].AddAsteroid(i);
         }
+    }
+
+    private void CheckCollisions(int i)
+    {
+        int x = _cellPositionsX[i];
+        int y = _cellPositionsY[i];
+
+        foreach (int asteroidId in _cells[x, y].Asteroids)
+        {
+            if (asteroidId == -1)
+            {
+                break;
+            }
+
+            if (asteroidId == i || _timeToSpawn[asteroidId] > 0f)
+            {
+                continue;
+            }
+
+            float sqrMagnitude = SqrMagnitude(
+                _localPositionsX[i], _localPositionsY[i],
+                _localPositionsX[asteroidId], _localPositionsY[asteroidId]);
+
+            if (sqrMagnitude < 0.2f)
+            {
+                _timeToSpawn[i] = 1f;
+                _timeToSpawn[asteroidId] = 1f;
+            }
+        }
+    }
+
+    private float SqrMagnitude(float x1, float y1, float x2, float y2)
+    {
+        float dx = x1 - x2;
+        float dy = y1 - y2;
+
+        return (dx * dx) + (dy * dy);
     }
 
     public Vector2 AsteroidLocalPosition(int index)

@@ -90,6 +90,11 @@ public class AsteroidsView : MonoBehaviour
         var asteroids = _asteroidsController.GetAsteroidIdsInCell(cellPosition);
         foreach (int index in asteroids)
         {
+            if (index == -1)
+            {
+                break;
+            }
+
             Vector2 asteroidLocalPosition = _asteroidsController.AsteroidLocalPosition(index);
             Vector2 position = cellPosition + asteroidLocalPosition - _shipModel.Position;
 

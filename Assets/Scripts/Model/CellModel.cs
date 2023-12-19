@@ -1,20 +1,38 @@
-using System.Collections.Generic;
+using System;
+using System.Linq;
 using UnityEngine.Assertions;
 
 public class CellModel
 {
-    private readonly List<int> _asteroids = new();
-    public IEnumerable<int> Asteroids => _asteroids;
+    public readonly int[] Asteroids = new int[20];
+    private int _cursor = 0;
+
+    public CellModel()
+    {
+        for (var i = 0; i < Asteroids.Length; i++)
+        {
+            Asteroids[i] = -1;
+        }
+    }
 
     public void AddAsteroid(int index)
     {
-        Assert.IsTrue(!_asteroids.Contains(index), "Asteroid already exists in cell.");
+        Assert.IsTrue(!Asteroids.Contains(index), "Asteroid already exists in cell.");
+        Assert.IsTrue(_cursor < Asteroids.Length, "Cell is full.");
 
-        _asteroids.Add(index);
+        Asteroids[_cursor++] = index;
     }
 
     public void RemoveAsteroid(int index)
     {
-        _asteroids.Remove(index);
+        Assert.IsTrue(Asteroids.Contains(index), "Asteroid doesn't exist in cell.");
+        Assert.IsTrue(_cursor > 0, "Cell is empty.");
+
+        int indexInCell = Array.IndexOf(Asteroids, index);
+
+        _cursor--;
+
+        Asteroids[indexInCell] = Asteroids[_cursor];
+        Asteroids[_cursor] = -1;
     }
 }

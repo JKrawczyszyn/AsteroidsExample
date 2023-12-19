@@ -8,7 +8,7 @@ public class GameContext : MonoBehaviour
 
     private void Awake()
     {
-        Application.targetFrameRate = 300;
+        Application.targetFrameRate = -1;
 
         var asteroidsModel = new AsteroidsModel(512, 512);
         AsteroidsController = new AsteroidsController(asteroidsModel);

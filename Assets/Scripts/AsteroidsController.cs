@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AsteroidsController
@@ -14,11 +13,16 @@ public class AsteroidsController
 
     private void AddAsteroidInCenterOfEachCell()
     {
+        Random.InitState(111);
+
         for (var x = 0; x < _model.CellsWidth; x++)
         {
             for (var y = 0; y < _model.CellsHeight; y++)
             {
-                _model.AddAsteroid(new Vector2Int(x, y), new Vector2(0.5f, 0.5f), Vector2.zero);
+                var localPosition = new Vector2(0.5f, 0.5f);
+                var velocity = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized
+                    * Random.Range(0.1f, 0.2f);
+                _model.AddAsteroid(new Vector2Int(x, y), localPosition, velocity);
             }
         }
     }
@@ -28,7 +32,7 @@ public class AsteroidsController
         _model.Update(deltaTime);
     }
 
-    public IEnumerable<int> GetAsteroidIdsInCell(Vector2Int position)
+    public int[] GetAsteroidIdsInCell(Vector2Int position)
     {
         return _model.GetAsteroidIdsInCell(position);
     }
