@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class ShipModel
+public class ShipController
 {
     private const float Acceleration = 0.1f;
     private const float MaxVelocity = 2f;
@@ -16,7 +16,7 @@ public class ShipModel
     private readonly int _width;
     private readonly int _height;
 
-    public ShipModel(Vector2 position, Vector2 velocity, Vector2 angle, int width, int height)
+    public ShipController(Vector2 position, Vector2 velocity, Vector2 angle, int width, int height)
     {
         _position = position;
         _velocity = velocity;

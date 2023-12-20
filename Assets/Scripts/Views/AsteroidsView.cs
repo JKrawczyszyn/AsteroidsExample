@@ -15,7 +15,7 @@ public class AsteroidsView : MonoBehaviour
     private int _halfHeight;
 
     private AsteroidsController _asteroidsController;
-    private ShipModel _shipModel;
+    private ShipController _shipController;
 
     private Dictionary<int, GameObject> _asteroids;
 
@@ -33,7 +33,7 @@ public class AsteroidsView : MonoBehaviour
         _halfHeight = (int)Mathf.Ceil(_camera.orthographicSize) + 1;
 
         _asteroidsController = GameContext.AsteroidsController;
-        _shipModel = GameContext.ShipModel;
+        _shipController = GameContext.ShipController;
 
         _asteroids = new Dictionary<int, GameObject>();
 
@@ -51,7 +51,7 @@ public class AsteroidsView : MonoBehaviour
     private void Update()
     {
         _asteroidsController.Update(Time.deltaTime);
-        _shipModel.Update(Time.deltaTime);
+        _shipController.Update(Time.deltaTime);
 
         _updatedInFrame.Clear();
 
@@ -59,17 +59,21 @@ public class AsteroidsView : MonoBehaviour
         RemoveNotUpdated();
     }
 
+    private void FixedUpdate()
+    {
+        _asteroidsController.FixedUpdate();
+    }
+
     private void UpdateAsteroids()
     {
-        var shipPositionX = (int)_shipModel.Position.x;
-        var shipPositionY = (int)_shipModel.Position.y;
+        var shipPositionX = (int)_shipController.Position.x;
+        var shipPositionY = (int)_shipController.Position.y;
 
         for (int x = shipPositionX - _halfWidth; x < shipPositionX + _halfWidth; x++)
         {
             for (int y = shipPositionY - _halfHeight; y < shipPositionY + _halfHeight; y++)
             {
-                var cellPosition = new Vector2Int(x, y);
-                var updated = UpdateCell(cellPosition);
+                var updated = UpdateCell(new Vector2Int(x, y));
                 _updatedInFrame.AddRange(updated);
             }
         }
@@ -78,16 +82,17 @@ public class AsteroidsView : MonoBehaviour
     private void RemoveNotUpdated()
     {
         var toRemove = _asteroids.Keys.Except(_updatedInFrame);
-        foreach (int asteroid in toRemove.ToArray())
+        foreach (int index in toRemove.ToArray())
         {
-            _pool.Release(_asteroids[asteroid]);
-            _asteroids.Remove(asteroid);
+            GameObject go = _asteroids[index];
+            _pool.Release(go);
+            _asteroids.Remove(index);
         }
     }
 
     private IEnumerable<int> UpdateCell(Vector2Int cellPosition)
     {
-        var asteroids = _asteroidsController.GetAsteroidIdsInCell(cellPosition);
+        int[] asteroids = _asteroidsController.GetAsteroidIdsInCell(cellPosition);
         foreach (int index in asteroids)
         {
             if (index == -1)
@@ -95,25 +100,30 @@ public class AsteroidsView : MonoBehaviour
                 break;
             }
 
-            Vector2 asteroidLocalPosition = _asteroidsController.AsteroidLocalPosition(index);
-            Vector2 position = cellPosition + asteroidLocalPosition - _shipModel.Position;
+            Vector2 localPosition = _asteroidsController.GetAsteroidLocalPosition(index);
+            Vector2 scenePosition = cellPosition + localPosition - _shipController.Position;
 
             if (_asteroids.TryGetValue(index, out GameObject go))
             {
-                go.transform.position = position;
+                go.transform.position = scenePosition;
             }
             else
             {
-                GameObject instance = _pool.Get();
-                instance.transform.position = position;
-
-                var text = instance.GetComponentInChildren<TextMeshPro>();
-                text.text = cellPosition.ToString();
-
-                _asteroids.Add(index, instance);
+                CreateAsteroid(index, scenePosition, cellPosition);
             }
 
             yield return index;
         }
+    }
+
+    private void CreateAsteroid(int index, Vector2 scenePosition, Vector2Int cellPosition)
+    {
+        GameObject instance = _pool.Get();
+        instance.transform.position = scenePosition;
+
+        var text = instance.GetComponentInChildren<TextMeshPro>();
+        text.text = cellPosition.ToString();
+
+        _asteroids.Add(index, instance);
     }
 }

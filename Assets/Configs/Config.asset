@@ -13,3 +13,6 @@ MonoBehaviour:
   m_Name: Config
   m_EditorClassIdentifier: 
   <GridSize>k__BackingField: {x: 512, y: 512}
+  <TimeToSpawnSeconds>k__BackingField: 1
+  <CollisionDistance>k__BackingField: 0.4
+  <Seed>k__BackingField: 111

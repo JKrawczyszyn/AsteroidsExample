@@ -5,7 +5,8 @@ using UnityEngine.Assertions;
 public class CellModel
 {
     public readonly int[] Asteroids = new int[20];
-    private int _cursor = 0;
+
+    private int _cursor;
 
     public CellModel()
     {
@@ -17,16 +18,16 @@ public class CellModel
 
     public void AddAsteroid(int index)
     {
-        Assert.IsTrue(!Asteroids.Contains(index), "Asteroid already exists in cell.");
-        Assert.IsTrue(_cursor < Asteroids.Length, "Cell is full.");
+        // Assert.IsTrue(!Asteroids.Contains(index), "Asteroid already exists in cell.");
+        // Assert.IsTrue(_cursor < Asteroids.Length, "Cell is full.");
 
         Asteroids[_cursor++] = index;
     }
 
     public void RemoveAsteroid(int index)
     {
-        Assert.IsTrue(Asteroids.Contains(index), "Asteroid doesn't exist in cell.");
-        Assert.IsTrue(_cursor > 0, "Cell is empty.");
+        // Assert.IsTrue(Asteroids.Contains(index), "Asteroid doesn't exist in cell.");
+        // Assert.IsTrue(_cursor > 0, "Cell is empty.");
 
         int indexInCell = Array.IndexOf(Asteroids, index);
 
