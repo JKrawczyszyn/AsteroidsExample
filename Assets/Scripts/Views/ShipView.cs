@@ -2,7 +2,8 @@
 
 public class ShipView : MonoBehaviour
 {
-    [SerializeField] private GameObject _ship;
+    [SerializeField]
+    private GameObject _ship;
 
     private ShipController _shipController;
 
@@ -21,7 +22,8 @@ public class ShipView : MonoBehaviour
         {
             _shipController.Decelerate();
         }
-        else if (Input.GetKey(KeyCode.A))
+
+        if (Input.GetKey(KeyCode.A))
         {
             _shipController.RotateLeft();
         }

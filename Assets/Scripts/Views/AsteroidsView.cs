@@ -7,7 +7,8 @@ using UnityEngine.Pool;
 
 public class AsteroidsView : MonoBehaviour
 {
-    [SerializeField] private GameObject _asteroidPrefab;
+    [SerializeField]
+    private GameObject _asteroidPrefab;
 
     private Camera _camera;
 
@@ -50,28 +51,29 @@ public class AsteroidsView : MonoBehaviour
 
     private void Update()
     {
-        _asteroidsController.Update(Time.deltaTime);
         _shipController.Update(Time.deltaTime);
 
-        _updatedInFrame.Clear();
-
-        UpdateAsteroids();
-        RemoveNotUpdated();
-    }
-
-    private void FixedUpdate()
-    {
-        _asteroidsController.FixedUpdate();
-    }
-
-    private void UpdateAsteroids()
-    {
         var shipPositionX = (int)_shipController.Position.x;
         var shipPositionY = (int)_shipController.Position.y;
 
-        for (int x = shipPositionX - _halfWidth; x < shipPositionX + _halfWidth; x++)
+        int xStart = shipPositionX - _halfWidth;
+        int yStart = shipPositionY - _halfHeight;
+        int xEnd = shipPositionX + _halfWidth;
+        int yEnd = shipPositionY + _halfHeight;
+
+        _asteroidsController.Update(Time.deltaTime, xStart, yStart, xEnd, yEnd);
+
+        _updatedInFrame.Clear();
+
+        UpdateAsteroids(xStart, yStart, xEnd, yEnd);
+        RemoveNotUpdated();
+    }
+
+    private void UpdateAsteroids(int xStart, int yStart, int xEnd, int yEnd)
+    {
+        for (int x = xStart; x < xEnd; x++)
         {
-            for (int y = shipPositionY - _halfHeight; y < shipPositionY + _halfHeight; y++)
+            for (int y = yStart; y < yEnd; y++)
             {
                 var updated = UpdateCell(new Vector2Int(x, y));
                 _updatedInFrame.AddRange(updated);
@@ -82,6 +84,7 @@ public class AsteroidsView : MonoBehaviour
     private void RemoveNotUpdated()
     {
         var toRemove = _asteroids.Keys.Except(_updatedInFrame);
+
         foreach (int index in toRemove.ToArray())
         {
             GameObject go = _asteroids[index];
@@ -109,21 +112,30 @@ public class AsteroidsView : MonoBehaviour
             }
             else
             {
-                CreateAsteroid(index, scenePosition, cellPosition);
+                go = CreateAsteroid(index, scenePosition);
             }
+
+            Vector2Int wrappedCellPosition
+                = cellPosition.Wrap(_asteroidsController.CellsWidth, _asteroidsController.CellsHeight);
+            UpdateText(go, index, wrappedCellPosition + localPosition);
 
             yield return index;
         }
     }
 
-    private void CreateAsteroid(int index, Vector2 scenePosition, Vector2Int cellPosition)
+    private void UpdateText(GameObject go, int index, Vector2 position)
     {
-        GameObject instance = _pool.Get();
-        instance.transform.position = scenePosition;
+        var text = go.GetComponentInChildren<TextMeshPro>();
+        text.text = $"{index}\n{position}";
+    }
 
-        var text = instance.GetComponentInChildren<TextMeshPro>();
-        text.text = cellPosition.ToString();
+    private GameObject CreateAsteroid(int index, Vector2 scenePosition)
+    {
+        GameObject go = _pool.Get();
+        go.transform.position = scenePosition;
 
-        _asteroids.Add(index, instance);
+        _asteroids.Add(index, go);
+
+        return go;
     }
 }

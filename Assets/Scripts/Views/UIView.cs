@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class UIView : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI _fpsText;
+    [SerializeField]
+    private TextMeshProUGUI _fpsText;
 
     private void Update()
     {

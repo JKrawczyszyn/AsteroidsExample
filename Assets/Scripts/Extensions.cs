@@ -7,6 +7,11 @@ public static class Extensions
         return new Vector2(value.x.Wrap(xSize), value.y.Wrap(ySize));
     }
 
+    public static Vector2Int Wrap(this Vector2Int value, int xSize, int ySize)
+    {
+        return new Vector2Int(value.x.Wrap(xSize), value.y.Wrap(ySize));
+    }
+
     public static int Wrap(this int value, int size)
     {
         while (value < 0)
@@ -35,5 +40,10 @@ public static class Extensions
         }
 
         return value;
+    }
+
+    public static bool Between(this float value, float min, float max)
+    {
+        return value >= min && value <= max;
     }
 }
