@@ -16,24 +16,24 @@ namespace Model
             }
         }
 
-        public void AddAsteroid(int index)
+        public void AddAsteroid(int id)
         {
-            // Assert.IsTrue(!Asteroids.Contains(index), "Asteroid already exists in cell.");
+            // Assert.IsTrue(!Asteroids.Contains(id), "Asteroid already exists in cell.");
             // Assert.IsTrue(_cursor < Asteroids.Length, "Cell is full.");
 
-            Asteroids[_cursor++] = index;
+            Asteroids[_cursor++] = id;
         }
 
-        public void RemoveAsteroid(int index)
+        public void RemoveAsteroid(int id)
         {
-            // Assert.IsTrue(Asteroids.Contains(index), "Asteroid doesn't exist in cell.");
+            // Assert.IsTrue(Asteroids.Contains(id), "Asteroid doesn't exist in cell.");
             // Assert.IsTrue(_cursor > 0, "Cell is empty.");
 
-            int indexInCell = Array.IndexOf(Asteroids, index);
+            int idInCell = Array.IndexOf(Asteroids, id);
 
             _cursor--;
 
-            Asteroids[indexInCell] = Asteroids[_cursor];
+            Asteroids[idInCell] = Asteroids[_cursor];
             Asteroids[_cursor] = -1;
         }
     }

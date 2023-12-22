@@ -103,46 +103,46 @@ namespace Views
         {
             var toRemove = _asteroids.Keys.Except(_updatedInFrame);
 
-            foreach (int index in toRemove.ToArray())
+            foreach (int id in toRemove.ToArray())
             {
-                GameObject go = _asteroids[index];
+                GameObject go = _asteroids[id];
                 _pool.Release(go);
-                _asteroids.Remove(index);
+                _asteroids.Remove(id);
             }
         }
 
         private IEnumerable<int> UpdateCell(Vector2Int cellPosition)
         {
             int[] asteroids = AsteroidsController.GetAsteroidIdsInCell(cellPosition);
-            foreach (int index in asteroids)
+            foreach (int id in asteroids)
             {
-                if (index == -1)
+                if (id == -1)
                 {
                     break;
                 }
 
-                Vector2 localPosition = AsteroidsController.GetAsteroidLocalPosition(index);
+                Vector2 localPosition = AsteroidsController.GetAsteroidLocalPosition(id);
                 Vector2 scenePosition = cellPosition + localPosition - ShipController.Position;
 
-                if (_asteroids.TryGetValue(index, out GameObject go))
+                if (_asteroids.TryGetValue(id, out GameObject go))
                 {
                     go.transform.position = scenePosition;
                 }
                 else
                 {
-                    CreateAsteroid(index, scenePosition);
+                    CreateAsteroid(id, scenePosition);
                 }
 
-                yield return index;
+                yield return id;
             }
         }
 
-        private void CreateAsteroid(int index, Vector2 scenePosition)
+        private void CreateAsteroid(int id, Vector2 scenePosition)
         {
             GameObject go = _pool.Get();
             go.transform.position = scenePosition;
 
-            _asteroids.Add(index, go);
+            _asteroids.Add(id, go);
         }
     }
 }

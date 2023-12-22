@@ -57,16 +57,16 @@ namespace Model
             }
         }
 
-        private void AddRandomAsteroid(int index)
+        private void AddRandomAsteroid(int id)
         {
             // Assert.IsNotNull(OnGetRandomPositionAndVelocity, "OnGetRandomPositionAndVelocity is null.");
 
             (Vector2 position, Vector2 velocity) = OnGetRandomPositionAndVelocity();
 
-            AddAsteroid(position, velocity, index);
+            AddAsteroid(position, velocity, id);
         }
 
-        public void AddAsteroid(Vector2 position, Vector2 velocity, int index)
+        public void AddAsteroid(Vector2 position, Vector2 velocity, int id)
         {
             var cellPosition = new Vector2Int((int)position.x, (int)position.y);
             var localPosition = position - cellPosition;
@@ -75,16 +75,16 @@ namespace Model
             Assert.IsTrue(localPosition.y is >= 0 and < 1f);
 
             CellModel cellModel = GetCell(cellPosition);
-            cellModel.AddAsteroid(index);
+            cellModel.AddAsteroid(id);
 
-            _cellPositionsX[index] = cellPosition.x.Wrap(CellsWidth);
-            _cellPositionsY[index] = cellPosition.y.Wrap(CellsHeight);
-            _localPositionsX[index] = localPosition.x;
-            _localPositionsY[index] = localPosition.y;
-            _velocitiesX[index] = velocity.x;
-            _velocitiesY[index] = velocity.y;
-            _deltaTimes[index] = 0f;
-            _isSpawned[index] = true;
+            _cellPositionsX[id] = cellPosition.x.Wrap(CellsWidth);
+            _cellPositionsY[id] = cellPosition.y.Wrap(CellsHeight);
+            _localPositionsX[id] = localPosition.x;
+            _localPositionsY[id] = localPosition.y;
+            _velocitiesX[id] = velocity.x;
+            _velocitiesY[id] = velocity.y;
+            _deltaTimes[id] = 0f;
+            _isSpawned[id] = true;
         }
 
         public int[] GetAsteroidIdsInCell(Vector2Int cellPosition)
@@ -109,9 +109,9 @@ namespace Model
 
         public void UpdateDeltaTime(float deltaTime)
         {
-            for (var index = 0; index < _cellsCount; index++)
+            for (var id = 0; id < _cellsCount; id++)
             {
-                _deltaTimes[index] += deltaTime;
+                _deltaTimes[id] += deltaTime;
             }
         }
 
@@ -123,34 +123,34 @@ namespace Model
                 {
                     int[] asteroidIds = GetAsteroidIdsInCell(x, y);
 
-                    foreach (int index in asteroidIds)
+                    foreach (int id in asteroidIds)
                     {
-                        if (index == -1)
+                        if (id == -1)
                         {
                             break;
                         }
 
-                        float deltaTime = _deltaTimes[index];
+                        float deltaTime = _deltaTimes[id];
 
-                        if (_timesToSpawn[index] > 0f)
+                        if (_timesToSpawn[id] > 0f)
                         {
-                            _timesToSpawn[index] -= deltaTime;
+                            _timesToSpawn[id] -= deltaTime;
 
-                            _deltaTimes[index] = 0f;
+                            _deltaTimes[id] = 0f;
 
                             continue;
                         }
 
-                        if (!_isSpawned[index])
+                        if (!_isSpawned[id])
                         {
-                            AddRandomAsteroid(index);
+                            AddRandomAsteroid(id);
                         }
 
-                        UpdatePositions(index, deltaTime);
+                        _deltaTimes[id] = 0f;
 
-                        _deltaTimes[index] = 0f;
+                        UpdatePositions(id, deltaTime);
 
-                        CheckCollisions(index);
+                        CheckCollisions(id);
                     }
                 }
             }
@@ -158,93 +158,93 @@ namespace Model
 
         public void UpdatePart(int from, int to, int xStart, int yStart, int xEnd, int yEnd)
         {
-            for (int index = from; index < to; index++)
+            for (int id = from; id < to; id++)
             {
-                int x = _cellPositionsX[index];
-                int y = _cellPositionsY[index];
+                int cellX = _cellPositionsX[id];
+                int cellY = _cellPositionsY[id];
 
-                if (x >= xStart && x < xEnd && y >= yStart && y < yEnd)
+                if (cellX >= xStart && cellX < xEnd && cellY >= yStart && cellY < yEnd)
                 {
                     continue;
                 }
 
-                float deltaTime = _deltaTimes[index];
+                float deltaTime = _deltaTimes[id];
 
-                if (_timesToSpawn[index] > 0f)
+                if (_timesToSpawn[id] > 0f)
                 {
-                    _timesToSpawn[index] -= deltaTime;
+                    _timesToSpawn[id] -= deltaTime;
 
-                    _deltaTimes[index] = 0f;
+                    _deltaTimes[id] = 0f;
 
                     continue;
                 }
 
-                if (!_isSpawned[index])
+                if (!_isSpawned[id])
                 {
-                    AddRandomAsteroid(index);
+                    AddRandomAsteroid(id);
                 }
 
-                UpdatePositions(index, deltaTime);
+                _deltaTimes[id] = 0f;
 
-                _deltaTimes[index] = 0f;
+                UpdatePositions(id, deltaTime);
 
-                CheckCollisions(index);
+                CheckCollisions(id);
             }
         }
 
-        private void UpdatePositions(int index, float deltaTime)
+        private void UpdatePositions(int id, float deltaTime)
         {
-            int x = _cellPositionsX[index];
-            int y = _cellPositionsY[index];
-            (int oldX, int oldY) = (x, y);
+            int cellX = _cellPositionsX[id];
+            int cellY = _cellPositionsY[id];
+            (int oldX, int oldY) = (cellX, cellY);
 
-            float localPositionX = _localPositionsX[index];
-            float localPositionY = _localPositionsY[index];
+            float localPositionX = _localPositionsX[id];
+            float localPositionY = _localPositionsY[id];
 
-            localPositionX += _velocitiesX[index] * deltaTime;
-            localPositionY += _velocitiesY[index] * deltaTime;
+            localPositionX += _velocitiesX[id] * deltaTime;
+            localPositionY += _velocitiesY[id] * deltaTime;
 
             if (localPositionX < 0)
             {
                 localPositionX += 1f;
-                x = (x - 1).Wrap(CellsWidth);
+                cellX = (cellX - 1).Wrap(CellsWidth);
             }
             else if (localPositionX >= 1f)
             {
                 localPositionX -= 1f;
-                x = (x + 1).Wrap(CellsWidth);
+                cellX = (cellX + 1).Wrap(CellsWidth);
             }
 
             if (localPositionY < 0)
             {
                 localPositionY += 1f;
-                y = (y - 1).Wrap(CellsHeight);
+                cellY = (cellY - 1).Wrap(CellsHeight);
             }
             else if (localPositionY >= 1f)
             {
                 localPositionY -= 1f;
-                y = (y + 1).Wrap(CellsHeight);
+                cellY = (cellY + 1).Wrap(CellsHeight);
             }
 
-            _localPositionsX[index] = localPositionX;
-            _localPositionsY[index] = localPositionY;
+            _localPositionsX[id] = localPositionX;
+            _localPositionsY[id] = localPositionY;
 
-            if (oldX != x || oldY != y)
+            if (oldX != cellX || oldY != cellY)
             {
-                _cellPositionsX[index] = x;
-                _cellPositionsY[index] = y;
+                _cells[oldX, oldY].RemoveAsteroid(id);
+                _cells[cellX, cellY].AddAsteroid(id);
 
-                _cells[oldX, oldY].RemoveAsteroid(index);
-                _cells[x, y].AddAsteroid(index);
+                _cellPositionsX[id] = cellX;
+                _cellPositionsY[id] = cellY;
             }
         }
 
-        private void CheckCollisions(int index)
+        private void CheckCollisions(int id)
         {
-            int x = _cellPositionsX[index];
-            int y = _cellPositionsY[index];
+            int cellX = _cellPositionsX[id];
+            int cellY = _cellPositionsY[id];
 
-            CellModel cellModel = _cells[x, y];
+            CellModel cellModel = _cells[cellX, cellY];
 
             foreach (int asteroidId in cellModel.Asteroids)
             {
@@ -253,13 +253,13 @@ namespace Model
                     break;
                 }
 
-                if (asteroidId == index || _timesToSpawn[asteroidId] > 0f)
+                if (asteroidId == id || _timesToSpawn[asteroidId] > 0f)
                 {
                     continue;
                 }
 
                 float sqrMagnitude = SqrMagnitude(
-                    _localPositionsX[index], _localPositionsY[index],
+                    _localPositionsX[id], _localPositionsY[id],
                     _localPositionsX[asteroidId], _localPositionsY[asteroidId]);
 
                 if (sqrMagnitude <= _sqrCollisionDistance)
@@ -269,10 +269,10 @@ namespace Model
 
                     cellModel.RemoveAsteroid(asteroidId);
 
-                    _isSpawned[index] = false;
-                    _timesToSpawn[index] = _timeToSpawnSeconds;
+                    _isSpawned[id] = false;
+                    _timesToSpawn[id] = _timeToSpawnSeconds;
 
-                    cellModel.RemoveAsteroid(index);
+                    cellModel.RemoveAsteroid(id);
 
                     break;
                 }
@@ -287,25 +287,25 @@ namespace Model
             return (dx * dx) + (dy * dy);
         }
 
-        public Vector2 GetAsteroidLocalPosition(int index)
+        public Vector2 GetAsteroidLocalPosition(int id)
         {
-            return new Vector2(_localPositionsX[index], _localPositionsY[index]);
+            return new Vector2(_localPositionsX[id], _localPositionsY[id]);
         }
 
-        public Vector2Int GetAsteroidCellPosition(int index)
+        public Vector2Int GetAsteroidCellPosition(int id)
         {
-            return new Vector2Int(_cellPositionsX[index], _cellPositionsY[index]);
+            return new Vector2Int(_cellPositionsX[id], _cellPositionsY[id]);
         }
 
-        public void Die(int index)
+        public void Destroy(int id)
         {
-            _isSpawned[index] = false;
-            _timesToSpawn[index] = _timeToSpawnSeconds;
+            _isSpawned[id] = false;
+            _timesToSpawn[id] = _timeToSpawnSeconds;
 
-            int x = _cellPositionsX[index];
-            int y = _cellPositionsY[index];
+            int cellX = _cellPositionsX[id];
+            int cellY = _cellPositionsY[id];
 
-            _cells[x, y].RemoveAsteroid(index);
+            _cells[cellX, cellY].RemoveAsteroid(id);
         }
     }
 }

@@ -68,7 +68,7 @@ namespace Controllers
 
         private void AddAsteroidInCenterOfEachCell()
         {
-            var index = 0;
+            var id = 0;
 
             for (var x = 0; x < _model.CellsWidth; x++)
             {
@@ -77,9 +77,9 @@ namespace Controllers
                     var position = new Vector2(x + 0.5f, y + 0.5f);
                     var velocity = GetRandomVelocity();
 
-                    Create(position, velocity, index);
+                    Create(position, velocity, id);
 
-                    index++;
+                    id++;
                 }
             }
         }
@@ -101,9 +101,9 @@ namespace Controllers
             return new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized * Random.Range(0.1f, 0.2f);
         }
 
-        private void Create(Vector2 position, Vector2 velocity, int index)
+        private void Create(Vector2 position, Vector2 velocity, int id)
         {
-            _model.AddAsteroid(position, velocity, index);
+            _model.AddAsteroid(position, velocity, id);
         }
 
         public void Update(float deltaTime, int xStart, int yStart, int xEnd, int yEnd)
@@ -126,19 +126,19 @@ namespace Controllers
             return _model.GetAsteroidIdsInCell(cellPosition);
         }
 
-        public Vector2 GetAsteroidLocalPosition(int index)
+        public Vector2 GetAsteroidLocalPosition(int id)
         {
-            return _model.GetAsteroidLocalPosition(index);
+            return _model.GetAsteroidLocalPosition(id);
         }
 
-        public Vector2Int GetAsteroidCellPosition(int index)
+        public Vector2Int GetAsteroidCellPosition(int id)
         {
-            return _model.GetAsteroidCellPosition(index);
+            return _model.GetAsteroidCellPosition(id);
         }
 
-        public void Die(int index)
+        public void Destroy(int id)
         {
-            _model.Die(index);
+            _model.Destroy(id);
         }
     }
 }

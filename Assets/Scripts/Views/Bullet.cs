@@ -43,10 +43,10 @@ namespace Views
         {
             Destroy(gameObject);
 
-            int index = GameView.AsteroidsView.GetId(collision.gameObject);
-            if (index != -1)
+            int id = GameView.AsteroidsView.GetId(collision.gameObject);
+            if (id != -1)
             {
-                GameView.AsteroidsController.Die(index);
+                GameView.AsteroidsController.Destroy(id);
             }
         }
     }
