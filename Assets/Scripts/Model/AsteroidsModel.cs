@@ -130,27 +130,7 @@ namespace Model
                             break;
                         }
 
-                        float deltaTime = _deltaTimes[id];
-
-                        if (_timesToSpawn[id] > 0f)
-                        {
-                            _timesToSpawn[id] -= deltaTime;
-
-                            _deltaTimes[id] = 0f;
-
-                            continue;
-                        }
-
-                        if (!_isSpawned[id])
-                        {
-                            AddRandomAsteroid(id);
-                        }
-
-                        _deltaTimes[id] = 0f;
-
-                        UpdatePositions(id, deltaTime);
-
-                        CheckCollisions(id);
+                        ProcessAsteroid(id);
                     }
                 }
             }
@@ -168,28 +148,33 @@ namespace Model
                     continue;
                 }
 
-                float deltaTime = _deltaTimes[id];
+                ProcessAsteroid(id);
+            }
+        }
 
-                if (_timesToSpawn[id] > 0f)
-                {
-                    _timesToSpawn[id] -= deltaTime;
+        private void ProcessAsteroid(int id)
+        {
+            float deltaTime = _deltaTimes[id];
 
-                    _deltaTimes[id] = 0f;
-
-                    continue;
-                }
-
-                if (!_isSpawned[id])
-                {
-                    AddRandomAsteroid(id);
-                }
+            if (_timesToSpawn[id] > 0f)
+            {
+                _timesToSpawn[id] -= deltaTime;
 
                 _deltaTimes[id] = 0f;
 
-                UpdatePositions(id, deltaTime);
-
-                CheckCollisions(id);
+                return;
             }
+
+            if (!_isSpawned[id])
+            {
+                AddRandomAsteroid(id);
+            }
+
+            _deltaTimes[id] = 0f;
+
+            UpdatePositions(id, deltaTime);
+
+            CheckCollisions(id);
         }
 
         private void UpdatePositions(int id, float deltaTime)
@@ -245,38 +230,45 @@ namespace Model
             int cellY = _cellPositionsY[id];
 
             CellModel cellModel = _cells[cellX, cellY];
+            CellModel cellModel2 = cellModel;
 
-            foreach (int asteroidId in cellModel.Asteroids)
+            foreach (int id2 in cellModel.Asteroids)
             {
-                if (asteroidId == -1)
-                {
+                if (!ProcessCollision(id, id2, cellModel, cellModel2))
                     break;
-                }
-
-                if (asteroidId == id || _timesToSpawn[asteroidId] > 0f)
-                {
-                    continue;
-                }
-
-                float sqrMagnitude = SqrMagnitude(
-                    _localPositionsX[id], _localPositionsY[id],
-                    _localPositionsX[asteroidId], _localPositionsY[asteroidId]);
-
-                if (sqrMagnitude <= _sqrCollisionDistance)
-                {
-                    _isSpawned[asteroidId] = false;
-                    _timesToSpawn[asteroidId] = _timeToSpawnSeconds;
-
-                    cellModel.RemoveAsteroid(asteroidId);
-
-                    _isSpawned[id] = false;
-                    _timesToSpawn[id] = _timeToSpawnSeconds;
-
-                    cellModel.RemoveAsteroid(id);
-
-                    break;
-                }
             }
+        }
+
+        private bool ProcessCollision(int id, int id2, CellModel cellModel, CellModel cellModel2)
+        {
+            if (id2 == -1)
+            {
+                return false;
+            }
+
+            if (id == id2 || _timesToSpawn[id2] > 0f)
+            {
+                return true;
+            }
+
+            float sqrMagnitude = SqrMagnitude(
+                _localPositionsX[id], _localPositionsY[id],
+                _localPositionsX[id2], _localPositionsY[id2]);
+
+            if (sqrMagnitude <= _sqrCollisionDistance)
+            {
+                _isSpawned[id] = false;
+                _timesToSpawn[id] = _timeToSpawnSeconds;
+
+                cellModel.RemoveAsteroid(id);
+
+                _isSpawned[id2] = false;
+                _timesToSpawn[id2] = _timeToSpawnSeconds;
+
+                cellModel2.RemoveAsteroid(id2);
+            }
+
+            return false;
         }
 
         private float SqrMagnitude(float x1, float y1, float x2, float y2)
