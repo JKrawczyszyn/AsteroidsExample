@@ -20,3 +20,6 @@ MonoBehaviour:
   <Acceleration>k__BackingField: 0.1
   <MaxVelocity>k__BackingField: 2
   <Rotation>k__BackingField: 2
+  <ShootDelay>k__BackingField: 0.5
+  <BulletSpeed>k__BackingField: 5
+  <BulletDestroyTime>k__BackingField: 3

@@ -29,9 +29,14 @@ namespace Views
 
         public int GetId(GameObject go)
         {
-            Assert.IsTrue(_asteroids.ContainsValue(go), "Asteroid is not found.");
+            var keyValuePair = _asteroids.FirstOrDefault(a => a.Value == go);
 
-            return _asteroids.First(a => a.Value == go).Key;
+            if (keyValuePair.Value == null)
+            {
+                return -1;
+            }
+
+            return keyValuePair.Key;
         }
 
         private void OnEnable()

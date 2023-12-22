@@ -6,7 +6,7 @@ namespace Model
 {
     public class AsteroidsModel
     {
-        public event Func<(Vector2 position, Vector2 velocity)> OnGetRandomPositionAndVelocity;
+        public event Func<(Vector2 position, Vector2 velocity)> GetRandomPositionAndVelocity;
 
         public readonly int CellsWidth;
         public readonly int CellsHeight;
@@ -26,8 +26,13 @@ namespace Model
 
         private readonly CellModel[,] _cells;
 
-        public AsteroidsModel(int width, int height, float timeToSpawnSeconds, float collisionDistance)
+        public AsteroidsModel(Config config)
         {
+            int width = config.GridSize.x;
+            int height = config.GridSize.y;
+            float timeToSpawnSeconds = config.TimeToSpawnSeconds;
+            float collisionDistance = config.CollisionDistance;
+
             CellsWidth = width;
             CellsHeight = height;
 
@@ -61,7 +66,7 @@ namespace Model
         {
             // Assert.IsNotNull(OnGetRandomPositionAndVelocity, "OnGetRandomPositionAndVelocity is null.");
 
-            (Vector2 position, Vector2 velocity) = OnGetRandomPositionAndVelocity();
+            (Vector2 position, Vector2 velocity) = GetRandomPositionAndVelocity();
 
             AddAsteroid(position, velocity, id);
         }
@@ -231,6 +236,7 @@ namespace Model
 
             var collided = false;
 
+            // Same cell
             CellModel cellModel = _cells[cellX, cellY];
 
             foreach (int id2 in cellModel.Asteroids)
@@ -255,6 +261,7 @@ namespace Model
             if (collided)
                 return;
 
+            // Neighbour cell +1 Y
             CellModel cellModel2 = _cells[cellX, (cellY + 1).Wrap(CellsHeight)];
 
             foreach (int id2 in cellModel2.Asteroids)
@@ -274,6 +281,7 @@ namespace Model
             if (collided)
                 return;
 
+            // Neighbour cell +1 X
             cellModel2 = _cells[(cellX + 1).Wrap(CellsWidth), cellY];
 
             foreach (int id2 in cellModel2.Asteroids)
@@ -289,6 +297,8 @@ namespace Model
                     break;
                 }
             }
+
+            // We could check also diagonal neighbours, but chance of collision is very low.
         }
 
         private bool ProcessCollision(int id, int id2, CellModel cellModel, CellModel cellModel2)

@@ -1,5 +1,4 @@
 ﻿using System;
-using UnityEngine;
 
 public class DelayedUpdater : IDisposable
 {
@@ -15,9 +14,9 @@ public class DelayedUpdater : IDisposable
         _currentTime = 0;
     }
 
-    public void Update()
+    public void Update(float deltaTime)
     {
-        _currentTime += Time.deltaTime;
+        _currentTime += deltaTime;
 
         if (_currentTime < _delayTime)
             return;

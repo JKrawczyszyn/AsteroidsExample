@@ -29,4 +29,13 @@ public class Config : ScriptableObject
 
     [field: SerializeField]
     public float Rotation { get; private set; }
+
+    [field: SerializeField]
+    public float ShootDelay { get; private set; }
+
+    [field: SerializeField]
+    public float BulletSpeed { get; private set; }
+
+    [field: SerializeField]
+    public float BulletDestroyTime { get; private set; }
 }

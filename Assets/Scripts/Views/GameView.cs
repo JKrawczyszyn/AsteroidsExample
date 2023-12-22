@@ -20,18 +20,18 @@ namespace Views
         private Config _config;
 
         // Static fields are used for simplicity.
-        public static Camera Camera;
         public static AsteroidsView AsteroidsView;
         public static ShipView ShipView;
+        public static Config Config;
 
         public static AsteroidsController AsteroidsController;
         public static ShipController ShipController;
 
         private void Awake()
         {
-            Camera = Camera.main;
             AsteroidsView = _asteroidsView;
             ShipView = _shipView;
+            Config = _config;
 
             Application.targetFrameRate = 300;
 
@@ -56,13 +56,9 @@ namespace Views
 
         private void CreateControllers()
         {
-            var asteroidsModel = new AsteroidsModel(_config.GridSize.x, _config.GridSize.y, _config.TimeToSpawnSeconds,
-                _config.CollisionDistance);
-
+            var asteroidsModel = new AsteroidsModel(_config);
             AsteroidsController = new AsteroidsController(asteroidsModel, _config.Parts, _config.Seed);
-
-            ShipController = new ShipController(_config.GridSize / 2, Vector2.zero, Vector2.up, _config.GridSize.x,
-                _config.GridSize.y, _config.Acceleration, _config.MaxVelocity, _config.Rotation);
+            ShipController = new ShipController(_config, _config.GridSize / 2, Vector2.zero, Vector2.up);
         }
 
         private void OnDied()
@@ -81,9 +77,7 @@ namespace Views
         private static void DestroyControllers()
         {
             AsteroidsController.Dispose();
-            AsteroidsController = null;
-
-            ShipController = null;
+            ShipController.Dispose();
         }
     }
 }

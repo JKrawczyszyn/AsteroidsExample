@@ -15,7 +15,7 @@ namespace Views
 
         public event Action Start;
 
-        private DelayedUpdater _delayedUpdater;
+        private DelayedUpdater _fpsUpdater;
 
         public void SetStartButtonActive(bool value)
         {
@@ -24,22 +24,22 @@ namespace Views
 
         private void OnEnable()
         {
-            _delayedUpdater = new DelayedUpdater();
-            _delayedUpdater.Init(UpdateFps, 0.3f);
+            _fpsUpdater = new DelayedUpdater();
+            _fpsUpdater.Init(UpdateFps, 0.3f);
 
             _startButton.onClick.AddListener(() => Start?.Invoke());
         }
 
         private void OnDisable()
         {
-            _delayedUpdater.Dispose();
+            _fpsUpdater.Dispose();
 
             _startButton.onClick.RemoveListener(() => Start?.Invoke());
         }
 
         private void Update()
         {
-            _delayedUpdater.Update();
+            _fpsUpdater.Update(Time.deltaTime);
         }
 
         private void UpdateFps()

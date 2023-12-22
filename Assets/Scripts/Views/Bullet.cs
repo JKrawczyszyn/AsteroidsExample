@@ -4,50 +4,49 @@ namespace Views
 {
     public class Bullet : MonoBehaviour
     {
-        private float _halfHeight;
-        private float _halfWidth;
+        private float _bulletSpeed;
 
         private Transform _transform;
 
-        public void Init(float angle)
-        {
-            _transform = transform;
+        private DelayedUpdater _destroyUpdater;
 
+        public void Init(Config config, float angle)
+        {
+            _bulletSpeed = config.BulletSpeed;
+
+            _transform = transform;
             _transform.rotation = Quaternion.Euler(0, 0, angle);
 
-            _halfHeight = GameView.Camera.orthographicSize;
-            _halfWidth = GameView.Camera.aspect * _halfHeight;
+            _destroyUpdater = new DelayedUpdater();
+            _destroyUpdater.Init(Destroy, config.BulletDestroyTime);
+        }
+
+        private void OnDestroy()
+        {
+            _destroyUpdater.Dispose();
         }
 
         private void Update()
         {
-            if (OutsideCamera())
-            {
-                Destroy(gameObject);
-            }
+            _transform.position += _transform.up * Time.deltaTime * _bulletSpeed;
 
-            _transform.position += _transform.up * Time.deltaTime * 5;
-        }
-
-        private bool OutsideCamera()
-        {
-            Vector3 position = transform.position;
-
-            return position.x < -_halfWidth
-                || position.x > _halfWidth
-                || position.y < -_halfHeight
-                || position.y > _halfHeight;
+            _destroyUpdater.Update(Time.deltaTime);
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            Destroy(gameObject);
+            Destroy();
 
             int id = GameView.AsteroidsView.GetId(collision.gameObject);
             if (id != -1)
             {
                 GameView.AsteroidsController.Destroy(id);
             }
+        }
+
+        private void Destroy()
+        {
+            Destroy(gameObject);
         }
     }
 }

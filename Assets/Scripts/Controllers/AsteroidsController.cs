@@ -20,9 +20,6 @@ namespace Controllers
         private int _xEnd;
         private int _yEnd;
 
-        public int CellsWidth => _model.CellsWidth;
-        public int CellsHeight => _model.CellsHeight;
-
         public AsteroidsController(AsteroidsModel model, int parts, int seed)
         {
             _model = model;
@@ -31,7 +28,7 @@ namespace Controllers
 
             (_partsFrom, _partsTo) = ComputeParts(model.CellsCount, parts);
 
-            _model.OnGetRandomPositionAndVelocity += GetRandomPositionAndVelocity;
+            _model.GetRandomPositionAndVelocity += OnGetRandomPositionAndVelocity;
 
             Random.InitState(seed);
 
@@ -58,10 +55,10 @@ namespace Controllers
 
         public void Dispose()
         {
-            _model.OnGetRandomPositionAndVelocity -= GetRandomPositionAndVelocity;
+            _model.GetRandomPositionAndVelocity -= OnGetRandomPositionAndVelocity;
         }
 
-        private (Vector2 position, Vector2 velocity) GetRandomPositionAndVelocity()
+        private (Vector2 position, Vector2 velocity) OnGetRandomPositionAndVelocity()
         {
             return (GetRandomPosition(), GetRandomVelocity());
         }
@@ -115,6 +112,7 @@ namespace Controllers
 
             _model.UpdateDeltaTime(deltaTime);
             _model.UpdateViewport(xStart, yStart, xEnd, yEnd);
+            // Update of cells outside view is done in parts.
             _model.UpdatePart(_partsFrom[_partCounter], _partsTo[_partCounter], xStart, yStart, xEnd, yEnd);
 
             _partCounter++;

@@ -10,24 +10,10 @@ namespace Views
 
         public event Action Died;
 
-        private DelayedUpdater _delayedUpdater;
-
-        private void Start()
+        public void Shoot()
         {
-            _delayedUpdater = new DelayedUpdater();
-            _delayedUpdater.Init(Shoot, 0.2f);
-        }
-
-        private void Update()
-        {
-            _delayedUpdater.Update();
-        }
-
-        private void Shoot()
-        {
-            Bullet bullet = Instantiate(_bulletPrefab, transform.position, Quaternion.identity,
-                GameView.ShipView.transform);
-            bullet.Init(transform.rotation.eulerAngles.z);
+            Bullet bullet = Instantiate(_bulletPrefab, transform.position, Quaternion.identity, GameView.ShipView.transform);
+            bullet.Init(GameView.Config, transform.rotation.eulerAngles.z);
         }
 
         private void OnTriggerEnter2D(Collider2D collision)

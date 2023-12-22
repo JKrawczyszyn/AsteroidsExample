@@ -17,6 +17,16 @@ namespace Views
 
         private ShipController ShipController => GameView.ShipController;
 
+        private void OnEnable()
+        {
+            ShipController.Shoot += _ship.Shoot;
+        }
+
+        private void OnDisable()
+        {
+            ShipController.Shoot -= _ship.Shoot;
+        }
+
         private void Update()
         {
             if (Input.GetKey(KeyCode.W))
