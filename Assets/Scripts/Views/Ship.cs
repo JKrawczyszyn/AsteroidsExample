@@ -1,12 +1,37 @@
 ﻿using System;
 using UnityEngine;
 
-public class Ship : MonoBehaviour
+namespace Views
 {
-    public event Action Died;
-
-    private void OnTriggerEnter2D(Collider2D collision)
+    public class Ship : MonoBehaviour
     {
-        Died?.Invoke();
+        [SerializeField]
+        private Bullet _bulletPrefab;
+
+        public event Action Died;
+
+        private DelayedUpdater _delayedUpdater;
+
+        private void Start()
+        {
+            _delayedUpdater = new DelayedUpdater();
+            _delayedUpdater.Init(Shoot, 0.2f);
+        }
+
+        private void Update()
+        {
+            _delayedUpdater.Update();
+        }
+
+        private void Shoot()
+        {
+            Bullet bullet = Instantiate(_bulletPrefab, transform.position, Quaternion.identity);
+            bullet.Init(transform.rotation.eulerAngles.z);
+        }
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            Died?.Invoke();
+        }
     }
 }

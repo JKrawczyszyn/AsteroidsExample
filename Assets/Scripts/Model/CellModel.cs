@@ -1,37 +1,40 @@
 using System;
 
-public class CellModel
+namespace Model
 {
-    public readonly int[] Asteroids = new int[20];
-
-    private int _cursor;
-
-    public CellModel()
+    public class CellModel
     {
-        for (var i = 0; i < Asteroids.Length; i++)
+        public readonly int[] Asteroids = new int[20];
+
+        private int _cursor;
+
+        public CellModel()
         {
-            Asteroids[i] = -1;
+            for (var i = 0; i < Asteroids.Length; i++)
+            {
+                Asteroids[i] = -1;
+            }
         }
-    }
 
-    public void AddAsteroid(int index)
-    {
-        // Assert.IsTrue(!Asteroids.Contains(index), "Asteroid already exists in cell.");
-        // Assert.IsTrue(_cursor < Asteroids.Length, "Cell is full.");
+        public void AddAsteroid(int index)
+        {
+            // Assert.IsTrue(!Asteroids.Contains(index), "Asteroid already exists in cell.");
+            // Assert.IsTrue(_cursor < Asteroids.Length, "Cell is full.");
 
-        Asteroids[_cursor++] = index;
-    }
+            Asteroids[_cursor++] = index;
+        }
 
-    public void RemoveAsteroid(int index)
-    {
-        // Assert.IsTrue(Asteroids.Contains(index), "Asteroid doesn't exist in cell.");
-        // Assert.IsTrue(_cursor > 0, "Cell is empty.");
+        public void RemoveAsteroid(int index)
+        {
+            // Assert.IsTrue(Asteroids.Contains(index), "Asteroid doesn't exist in cell.");
+            // Assert.IsTrue(_cursor > 0, "Cell is empty.");
 
-        int indexInCell = Array.IndexOf(Asteroids, index);
+            int indexInCell = Array.IndexOf(Asteroids, index);
 
-        _cursor--;
+            _cursor--;
 
-        Asteroids[indexInCell] = Asteroids[_cursor];
-        Asteroids[_cursor] = -1;
+            Asteroids[indexInCell] = Asteroids[_cursor];
+            Asteroids[_cursor] = -1;
+        }
     }
 }

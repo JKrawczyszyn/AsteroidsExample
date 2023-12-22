@@ -3,40 +3,50 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIView : MonoBehaviour
+namespace Views
 {
-    [SerializeField]
-    private TextMeshProUGUI _fpsText;
-
-    [SerializeField]
-    private Button _startButton;
-
-    public event Action Start;
-
-    private void OnEnable()
+    public class UIView : MonoBehaviour
     {
-        _startButton.onClick.AddListener(() => Start?.Invoke());
-    }
+        [SerializeField]
+        private TextMeshProUGUI _fpsText;
 
-    private void OnDisable()
-    {
-        _startButton.onClick.RemoveListener(() => Start?.Invoke());
-    }
+        [SerializeField]
+        private Button _startButton;
 
-    private void Update()
-    {
-        float fps = Mathf.Round(1f / Time.deltaTime);
+        public event Action Start;
 
-        _fpsText.text = $"FPS: {fps}";
-    }
+        private DelayedUpdater _delayedUpdater;
 
-    public void HideButton()
-    {
-        _startButton.gameObject.SetActive(false);
-    }
+        public void SetStartButtonActive(bool value)
+        {
+            _startButton.gameObject.SetActive(value);
+        }
 
-    public void ShowButton()
-    {
-        _startButton.gameObject.SetActive(true);
+        private void OnEnable()
+        {
+            _delayedUpdater = new DelayedUpdater();
+            _delayedUpdater.Init(UpdateFps, 0.3f);
+
+            _startButton.onClick.AddListener(() => Start?.Invoke());
+        }
+
+        private void OnDisable()
+        {
+            _delayedUpdater.Dispose();
+
+            _startButton.onClick.RemoveListener(() => Start?.Invoke());
+        }
+
+        private void Update()
+        {
+            _delayedUpdater.Update();
+        }
+
+        private void UpdateFps()
+        {
+            float fps = 1f / Time.deltaTime;
+
+            _fpsText.text = $"FPS: {Mathf.Round(fps)}";
+        }
     }
 }

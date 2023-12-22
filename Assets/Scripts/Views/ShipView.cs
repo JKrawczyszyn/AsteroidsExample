@@ -1,40 +1,44 @@
 ﻿using System;
+using Controllers;
 using UnityEngine;
 
-public class ShipView : MonoBehaviour
+namespace Views
 {
-    [SerializeField]
-    private Ship _ship;
-
-    public event Action Died
+    public class ShipView : MonoBehaviour
     {
-        add => _ship.Died += value;
-        remove => _ship.Died -= value;
-    }
+        [SerializeField]
+        private Ship _ship;
 
-    private ShipController ShipController => GameController.ShipController;
-
-    private void Update()
-    {
-        if (Input.GetKey(KeyCode.W))
+        public event Action Died
         {
-            ShipController.Accelerate();
-        }
-        else if (Input.GetKey(KeyCode.S))
-        {
-            ShipController.Decelerate();
+            add => _ship.Died += value;
+            remove => _ship.Died -= value;
         }
 
-        if (Input.GetKey(KeyCode.A))
-        {
-            ShipController.RotateLeft();
-        }
-        else if (Input.GetKey(KeyCode.D))
-        {
-            ShipController.RotateRight();
-        }
+        private ShipController ShipController => GameView.ShipController;
 
-        _ship.transform.rotation
-            = Quaternion.Euler(0, 0, (Mathf.Atan2(ShipController.Angle.y, ShipController.Angle.x) * Mathf.Rad2Deg) - 90);
+        private void Update()
+        {
+            if (Input.GetKey(KeyCode.W))
+            {
+                ShipController.Accelerate();
+            }
+            else if (Input.GetKey(KeyCode.S))
+            {
+                ShipController.Decelerate();
+            }
+
+            if (Input.GetKey(KeyCode.A))
+            {
+                ShipController.RotateLeft();
+            }
+            else if (Input.GetKey(KeyCode.D))
+            {
+                ShipController.RotateRight();
+            }
+
+            _ship.transform.rotation
+                = Quaternion.Euler(0, 0, (Mathf.Atan2(ShipController.Angle.y, ShipController.Angle.x) * Mathf.Rad2Deg) - 90);
+        }
     }
 }
