@@ -229,46 +229,94 @@ namespace Model
             int cellX = _cellPositionsX[id];
             int cellY = _cellPositionsY[id];
 
+            var collided = false;
+
             CellModel cellModel = _cells[cellX, cellY];
-            CellModel cellModel2 = cellModel;
 
             foreach (int id2 in cellModel.Asteroids)
             {
-                if (!ProcessCollision(id, id2, cellModel, cellModel2))
+                if (id == id2)
+                {
+                    continue;
+                }
+
+                if (id2 == -1)
+                {
                     break;
+                }
+
+                collided = ProcessCollision(id, id2, cellModel, cellModel);
+                if (collided)
+                {
+                    break;
+                }
+            }
+
+            if (collided)
+                return;
+
+            CellModel cellModel2 = _cells[cellX, (cellY + 1).Wrap(CellsHeight)];
+
+            foreach (int id2 in cellModel2.Asteroids)
+            {
+                if (id2 == -1)
+                {
+                    break;
+                }
+
+                collided = ProcessCollision(id, id2, cellModel, cellModel2);
+                if (collided)
+                {
+                    break;
+                }
+            }
+
+            if (collided)
+                return;
+
+            cellModel2 = _cells[(cellX + 1).Wrap(CellsWidth), cellY];
+
+            foreach (int id2 in cellModel2.Asteroids)
+            {
+                if (id2 == -1)
+                {
+                    break;
+                }
+
+                collided = ProcessCollision(id, id2, cellModel, cellModel2);
+                if (collided)
+                {
+                    break;
+                }
             }
         }
 
         private bool ProcessCollision(int id, int id2, CellModel cellModel, CellModel cellModel2)
         {
-            if (id2 == -1)
+            if (_timesToSpawn[id2] > 0f)
             {
                 return false;
             }
 
-            if (id == id2 || _timesToSpawn[id2] > 0f)
-            {
-                return true;
-            }
-
             float sqrMagnitude = SqrMagnitude(
-                _localPositionsX[id], _localPositionsY[id],
-                _localPositionsX[id2], _localPositionsY[id2]);
+                _cellPositionsX[id] + _localPositionsX[id], _cellPositionsY[id] + _localPositionsY[id],
+                _cellPositionsX[id2] + _localPositionsX[id2], _cellPositionsY[id2] + _localPositionsY[id2]
+            );
 
-            if (sqrMagnitude <= _sqrCollisionDistance)
-            {
-                _isSpawned[id] = false;
-                _timesToSpawn[id] = _timeToSpawnSeconds;
+            if (sqrMagnitude > _sqrCollisionDistance)
+                return false;
 
-                cellModel.RemoveAsteroid(id);
+            _isSpawned[id] = false;
+            _timesToSpawn[id] = _timeToSpawnSeconds;
 
-                _isSpawned[id2] = false;
-                _timesToSpawn[id2] = _timeToSpawnSeconds;
+            cellModel.RemoveAsteroid(id);
 
-                cellModel2.RemoveAsteroid(id2);
-            }
+            _isSpawned[id2] = false;
+            _timesToSpawn[id2] = _timeToSpawnSeconds;
 
-            return false;
+            cellModel2.RemoveAsteroid(id2);
+
+            return true;
         }
 
         private float SqrMagnitude(float x1, float y1, float x2, float y2)

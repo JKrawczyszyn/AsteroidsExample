@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <GridSize>k__BackingField: {x: 512, y: 512}
   <TimeToSpawnSeconds>k__BackingField: 1
-  <CollisionDistance>k__BackingField: 0.4
+  <CollisionDistance>k__BackingField: 0.3
   <Parts>k__BackingField: 20
   <Seed>k__BackingField: 111
   <Acceleration>k__BackingField: 0.1

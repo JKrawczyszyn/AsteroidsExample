@@ -22,6 +22,7 @@ namespace Views
         // Static fields are used for simplicity.
         public static Camera Camera;
         public static AsteroidsView AsteroidsView;
+        public static ShipView ShipView;
 
         public static AsteroidsController AsteroidsController;
         public static ShipController ShipController;
@@ -30,6 +31,7 @@ namespace Views
         {
             Camera = Camera.main;
             AsteroidsView = _asteroidsView;
+            ShipView = _shipView;
 
             Application.targetFrameRate = 300;
 

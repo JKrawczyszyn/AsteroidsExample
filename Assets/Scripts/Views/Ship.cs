@@ -25,7 +25,8 @@ namespace Views
 
         private void Shoot()
         {
-            Bullet bullet = Instantiate(_bulletPrefab, transform.position, Quaternion.identity);
+            Bullet bullet = Instantiate(_bulletPrefab, transform.position, Quaternion.identity,
+                GameView.ShipView.transform);
             bullet.Init(transform.rotation.eulerAngles.z);
         }
 
