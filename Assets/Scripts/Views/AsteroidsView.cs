@@ -15,8 +15,8 @@ public class AsteroidsView : MonoBehaviour
     private int _halfWidth;
     private int _halfHeight;
 
-    private AsteroidsController _asteroidsController;
-    private ShipController _shipController;
+    private AsteroidsController AsteroidsController => GameController.AsteroidsController;
+    private ShipController ShipController => GameController.ShipController;
 
     private Dictionary<int, GameObject> _asteroids;
 
@@ -24,7 +24,7 @@ public class AsteroidsView : MonoBehaviour
 
     private List<int> _updatedInFrame;
 
-    private void Start()
+    private void OnEnable()
     {
         _camera = Camera.main;
 
@@ -32,9 +32,6 @@ public class AsteroidsView : MonoBehaviour
 
         _halfWidth = (int)Mathf.Ceil(_camera.orthographicSize * _camera.aspect) + 1;
         _halfHeight = (int)Mathf.Ceil(_camera.orthographicSize) + 1;
-
-        _asteroidsController = GameContext.AsteroidsController;
-        _shipController = GameContext.ShipController;
 
         _asteroids = new Dictionary<int, GameObject>();
 
@@ -49,19 +46,30 @@ public class AsteroidsView : MonoBehaviour
         _updatedInFrame = new List<int>();
     }
 
+    private void OnDisable()
+    {
+        foreach (var go in _asteroids.Values)
+        {
+            _pool.Release(go);
+        }
+
+        _asteroids.Clear();
+        _pool.Clear();
+    }
+
     private void Update()
     {
-        _shipController.Update(Time.deltaTime);
+        ShipController.Update(Time.deltaTime);
 
-        var shipPositionX = (int)_shipController.Position.x;
-        var shipPositionY = (int)_shipController.Position.y;
+        var shipPositionX = (int)ShipController.Position.x;
+        var shipPositionY = (int)ShipController.Position.y;
 
         int xStart = shipPositionX - _halfWidth;
         int yStart = shipPositionY - _halfHeight;
         int xEnd = shipPositionX + _halfWidth;
         int yEnd = shipPositionY + _halfHeight;
 
-        _asteroidsController.Update(Time.deltaTime, xStart, yStart, xEnd, yEnd);
+        AsteroidsController.Update(Time.deltaTime, xStart, yStart, xEnd, yEnd);
 
         _updatedInFrame.Clear();
 
@@ -95,7 +103,7 @@ public class AsteroidsView : MonoBehaviour
 
     private IEnumerable<int> UpdateCell(Vector2Int cellPosition)
     {
-        int[] asteroids = _asteroidsController.GetAsteroidIdsInCell(cellPosition);
+        int[] asteroids = AsteroidsController.GetAsteroidIdsInCell(cellPosition);
         foreach (int index in asteroids)
         {
             if (index == -1)
@@ -103,8 +111,8 @@ public class AsteroidsView : MonoBehaviour
                 break;
             }
 
-            Vector2 localPosition = _asteroidsController.GetAsteroidLocalPosition(index);
-            Vector2 scenePosition = cellPosition + localPosition - _shipController.Position;
+            Vector2 localPosition = AsteroidsController.GetAsteroidLocalPosition(index);
+            Vector2 scenePosition = cellPosition + localPosition - ShipController.Position;
 
             if (_asteroids.TryGetValue(index, out GameObject go))
             {
@@ -116,7 +124,7 @@ public class AsteroidsView : MonoBehaviour
             }
 
             Vector2Int wrappedCellPosition
-                = cellPosition.Wrap(_asteroidsController.CellsWidth, _asteroidsController.CellsHeight);
+                = cellPosition.Wrap(AsteroidsController.CellsWidth, AsteroidsController.CellsHeight);
             UpdateText(go, index, wrappedCellPosition + localPosition);
 
             yield return index;

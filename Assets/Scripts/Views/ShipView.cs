@@ -1,38 +1,40 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class ShipView : MonoBehaviour
 {
     [SerializeField]
-    private GameObject _ship;
+    private Ship _ship;
 
-    private ShipController _shipController;
-
-    private void Start()
+    public event Action Died
     {
-        _shipController = GameContext.ShipController;
+        add => _ship.Died += value;
+        remove => _ship.Died -= value;
     }
+
+    private ShipController ShipController => GameController.ShipController;
 
     private void Update()
     {
         if (Input.GetKey(KeyCode.W))
         {
-            _shipController.Accelerate();
+            ShipController.Accelerate();
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            _shipController.Decelerate();
+            ShipController.Decelerate();
         }
 
         if (Input.GetKey(KeyCode.A))
         {
-            _shipController.RotateLeft();
+            ShipController.RotateLeft();
         }
         else if (Input.GetKey(KeyCode.D))
         {
-            _shipController.RotateRight();
+            ShipController.RotateRight();
         }
 
         _ship.transform.rotation
-            = Quaternion.Euler(0, 0, (Mathf.Atan2(_shipController.Angle.y, _shipController.Angle.x) * Mathf.Rad2Deg) - 90);
+            = Quaternion.Euler(0, 0, (Mathf.Atan2(ShipController.Angle.y, ShipController.Angle.x) * Mathf.Rad2Deg) - 90);
     }
 }

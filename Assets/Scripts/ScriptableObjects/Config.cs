@@ -14,10 +14,19 @@ public class Config : ScriptableObject
 
     [field: SerializeField, Tooltip(
                 "Asteroids outside of camera are updated less frequently."
-                + "This is the value asteroid count is divided by"
+                + "Asteroid count is divided by this value "
                 + " to get the number of asteroids outside of camera that are updated in one frame.")]
     public int Parts { get; private set; }
 
     [field: SerializeField]
     public int Seed { get; private set; }
+
+    [field: SerializeField]
+    public float Acceleration { get; private set; }
+
+    [field: SerializeField]
+    public float MaxVelocity { get; private set; }
+
+    [field: SerializeField]
+    public float Rotation { get; private set; }
 }

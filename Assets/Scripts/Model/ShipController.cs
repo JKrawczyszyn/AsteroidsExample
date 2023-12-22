@@ -2,9 +2,6 @@
 
 public class ShipController
 {
-    private const float Acceleration = 0.1f;
-    private const float MaxVelocity = 2f;
-
     private Vector2 _position;
     public Vector2 Position => _position;
 
@@ -16,13 +13,21 @@ public class ShipController
     private readonly int _width;
     private readonly int _height;
 
-    public ShipController(Vector2 position, Vector2 velocity, Vector2 angle, int width, int height)
+    private readonly float _acceleration;
+    private readonly float _maxVelocity;
+    private readonly float _rotation;
+
+    public ShipController(Vector2 position, Vector2 velocity, Vector2 angle, int width, int height, float acceleration,
+        float maxVelocity, float rotation)
     {
         _position = position;
         _velocity = velocity;
         _angle = angle;
         _width = width;
         _height = height;
+        _acceleration = acceleration;
+        _maxVelocity = maxVelocity;
+        _rotation = rotation;
     }
 
     public void Update(float deltaTime)
@@ -33,25 +38,25 @@ public class ShipController
 
     public void Accelerate()
     {
-        _velocity += _angle.normalized * Acceleration;
+        _velocity += _angle.normalized * _acceleration;
 
-        _velocity = Vector2.ClampMagnitude(_velocity, MaxVelocity);
+        _velocity = Vector2.ClampMagnitude(_velocity, _maxVelocity);
     }
 
     public void Decelerate()
     {
-        _velocity -= _angle.normalized * Acceleration;
+        _velocity -= _angle.normalized * _acceleration;
 
-        _velocity = Vector2.ClampMagnitude(_velocity, MaxVelocity);
+        _velocity = Vector2.ClampMagnitude(_velocity, _maxVelocity);
     }
 
     public void RotateLeft()
     {
-        _angle = Quaternion.Euler(0, 0, 1) * _angle;
+        _angle = Quaternion.Euler(0, 0, _rotation) * _angle;
     }
 
     public void RotateRight()
     {
-        _angle = Quaternion.Euler(0, 0, -1) * _angle;
+        _angle = Quaternion.Euler(0, 0, -_rotation) * _angle;
     }
 }

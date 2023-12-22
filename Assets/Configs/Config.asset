@@ -17,3 +17,6 @@ MonoBehaviour:
   <CollisionDistance>k__BackingField: 0.4
   <Parts>k__BackingField: 20
   <Seed>k__BackingField: 111
+  <Acceleration>k__BackingField: 0.1
+  <MaxVelocity>k__BackingField: 2
+  <Rotation>k__BackingField: 2
