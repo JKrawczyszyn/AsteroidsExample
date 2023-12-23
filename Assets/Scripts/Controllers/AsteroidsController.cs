@@ -7,6 +7,8 @@ namespace Controllers
 {
     public class AsteroidsController : IDisposable
     {
+        public event Action Destroyed;
+
         private readonly AsteroidsModel _model;
 
         private readonly int _parts;
@@ -20,6 +22,8 @@ namespace Controllers
         private int _xEnd;
         private int _yEnd;
 
+        public int DestroyedCount { get; private set; }
+
         public AsteroidsController(AsteroidsModel model, int parts, int seed)
         {
             _model = model;
@@ -27,6 +31,8 @@ namespace Controllers
             _parts = parts;
 
             (_partsFrom, _partsTo) = ComputeParts(model.CellsCount, parts);
+
+            DestroyedCount = 0;
 
             _model.GetRandomPositionAndVelocity += OnGetRandomPositionAndVelocity;
 
@@ -137,6 +143,10 @@ namespace Controllers
         public void Destroy(int id)
         {
             _model.Destroy(id);
+
+            DestroyedCount++;
+
+            Destroyed?.Invoke();
         }
     }
 }

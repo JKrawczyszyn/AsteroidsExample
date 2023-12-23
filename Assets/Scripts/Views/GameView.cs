@@ -35,20 +35,23 @@ namespace Views
 
             Application.targetFrameRate = 300;
 
-            _uiView.Start += OnStart;
-            _shipView.Died += OnDied;
+            _uiView.Started += OnStarted;
 
             _asteroidsView.gameObject.SetActive(false);
             _shipView.gameObject.SetActive(false);
         }
 
-        private void OnDestroy()
+        private void Start()
         {
-            _uiView.Start -= OnStart;
-            _shipView.Died -= OnDied;
+            OnStarted();
         }
 
-        private void OnStart()
+        private void OnDestroy()
+        {
+            _uiView.Started -= OnStarted;
+        }
+
+        private void OnStarted()
         {
             CreateControllers();
             UpdateViews(true);
@@ -61,17 +64,26 @@ namespace Views
             ShipController = new ShipController(_config, _config.GridSize / 2, Vector2.zero, Vector2.up);
         }
 
-        private void OnDied()
-        {
-            DestroyControllers();
-            UpdateViews(false);
-        }
-
         private void UpdateViews(bool gameMode)
         {
             _asteroidsView.gameObject.SetActive(gameMode);
             _shipView.gameObject.SetActive(gameMode);
-            _uiView.SetStartButtonActive(!gameMode);
+            _uiView.SetMode(gameMode);
+
+            if (gameMode)
+            {
+                _shipView.Died += OnDied;
+            }
+            else
+            {
+                _shipView.Died -= OnDied;
+            }
+        }
+
+        private void OnDied()
+        {
+            DestroyControllers();
+            UpdateViews(false);
         }
 
         private static void DestroyControllers()

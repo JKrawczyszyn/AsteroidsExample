@@ -7,6 +7,8 @@ namespace Views
     public class ShipView : MonoBehaviour
     {
         [SerializeField]
+        private Ship _shipPrefab;
+
         private Ship _ship;
 
         public event Action Died
@@ -19,12 +21,19 @@ namespace Views
 
         private void OnEnable()
         {
+            _ship = Instantiate(_shipPrefab, transform);
+
             ShipController.Shoot += _ship.Shoot;
         }
 
         private void OnDisable()
         {
             ShipController.Shoot -= _ship.Shoot;
+
+            for (var i = 0; i < transform.childCount; i++)
+            {
+                Destroy(transform.GetChild(i).gameObject);
+            }
         }
 
         private void Update()
