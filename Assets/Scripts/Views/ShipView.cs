@@ -39,22 +39,14 @@ namespace Views
         private void Update()
         {
             if (Input.GetKey(KeyCode.W))
-            {
                 ShipController.Accelerate();
-            }
             else if (Input.GetKey(KeyCode.S))
-            {
                 ShipController.Decelerate();
-            }
 
             if (Input.GetKey(KeyCode.A))
-            {
                 ShipController.RotateLeft();
-            }
             else if (Input.GetKey(KeyCode.D))
-            {
                 ShipController.RotateRight();
-            }
 
             _ship.transform.rotation
                 = Quaternion.Euler(0, 0, (Mathf.Atan2(ShipController.Angle.y, ShipController.Angle.x) * Mathf.Rad2Deg) - 90);

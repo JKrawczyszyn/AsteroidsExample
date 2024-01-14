@@ -39,9 +39,7 @@ namespace Views
 
             int id = GameView.AsteroidsView.GetId(collision.gameObject);
             if (id != -1)
-            {
                 GameView.AsteroidsController.Destroy(id);
-            }
         }
 
         private void Destroy()

@@ -71,13 +71,9 @@ namespace Views
             _uiView.SetMode(gameMode);
 
             if (gameMode)
-            {
                 _shipView.Died += OnDied;
-            }
             else
-            {
                 _shipView.Died -= OnDied;
-            }
         }
 
         private void OnDied()

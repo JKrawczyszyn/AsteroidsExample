@@ -115,9 +115,7 @@ namespace Model
         public void UpdateDeltaTime(float deltaTime)
         {
             for (var id = 0; id < _cellsCount; id++)
-            {
                 _deltaTimes[id] += deltaTime;
-            }
         }
 
         public void UpdateViewport(int xStart, int yStart, int xEnd, int yEnd)
@@ -171,9 +169,7 @@ namespace Model
             }
 
             if (!_isSpawned[id])
-            {
                 AddRandomAsteroid(id);
-            }
 
             _deltaTimes[id] = 0f;
 
@@ -242,20 +238,14 @@ namespace Model
             foreach (int id2 in cellModel.Asteroids)
             {
                 if (id == id2)
-                {
                     continue;
-                }
 
                 if (id2 == -1)
-                {
                     break;
-                }
 
                 collided = ProcessCollision(id, id2, cellModel, cellModel);
                 if (collided)
-                {
                     break;
-                }
             }
 
             if (collided)
@@ -267,15 +257,11 @@ namespace Model
             foreach (int id2 in cellModel2.Asteroids)
             {
                 if (id2 == -1)
-                {
                     break;
-                }
 
                 collided = ProcessCollision(id, id2, cellModel, cellModel2);
                 if (collided)
-                {
                     break;
-                }
             }
 
             if (collided)
@@ -287,15 +273,11 @@ namespace Model
             foreach (int id2 in cellModel2.Asteroids)
             {
                 if (id2 == -1)
-                {
                     break;
-                }
 
                 collided = ProcessCollision(id, id2, cellModel, cellModel2);
                 if (collided)
-                {
                     break;
-                }
             }
 
             // We could check also diagonal neighbours, but chance of collision is very low.
@@ -304,9 +286,7 @@ namespace Model
         private bool ProcessCollision(int id, int id2, CellModel cellModel, CellModel cellModel2)
         {
             if (_timesToSpawn[id2] > 0f)
-            {
                 return false;
-            }
 
             float sqrMagnitude = SqrMagnitude(
                 _cellPositionsX[id] + _localPositionsX[id], _cellPositionsY[id] + _localPositionsY[id],

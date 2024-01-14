@@ -11,9 +11,7 @@ namespace Model
         public CellModel()
         {
             for (var i = 0; i < Asteroids.Length; i++)
-            {
                 Asteroids[i] = -1;
-            }
         }
 
         public void AddAsteroid(int id)

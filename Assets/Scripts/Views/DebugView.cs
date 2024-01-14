@@ -27,9 +27,7 @@ namespace Views
             var asteroids = GameView.AsteroidsView.Asteroids;
 
             if (asteroids == null)
-            {
                 return;
-            }
 
             foreach ((int index, GameObject go) in asteroids)
             {

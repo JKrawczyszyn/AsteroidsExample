@@ -32,9 +32,7 @@ namespace Views
             var keyValuePair = _asteroids.FirstOrDefault(a => a.Value == go);
 
             if (keyValuePair.Value == null)
-            {
                 return -1;
-            }
 
             return keyValuePair.Key;
         }
@@ -64,9 +62,7 @@ namespace Views
         private void OnDisable()
         {
             foreach (GameObject go in _asteroids.Values)
-            {
                 _pool.Release(go);
-            }
 
             _asteroids.Clear();
             _pool.Clear();
@@ -122,21 +118,15 @@ namespace Views
             foreach (int id in asteroids)
             {
                 if (id == -1)
-                {
                     break;
-                }
 
                 Vector2 localPosition = AsteroidsController.GetAsteroidLocalPosition(id);
                 Vector2 scenePosition = cellPosition + localPosition - ShipController.Position;
 
                 if (_asteroids.TryGetValue(id, out GameObject go))
-                {
                     go.transform.position = scenePosition;
-                }
                 else
-                {
                     CreateAsteroid(id, scenePosition);
-                }
 
                 yield return id;
             }
