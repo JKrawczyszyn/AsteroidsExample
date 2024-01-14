@@ -19,7 +19,7 @@ namespace Views
         [SerializeField]
         private Config _config;
 
-        // Static fields are used for simplicity.
+        // Static fields are used for simplicity. It should be replaced with for example, dependency injection or service locators.
         public static AsteroidsView AsteroidsView;
         public static ShipView ShipView;
         public static Config Config;
