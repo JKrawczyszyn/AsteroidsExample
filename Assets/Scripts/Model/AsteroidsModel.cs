@@ -6,8 +6,6 @@ namespace Model
 {
     public class AsteroidsModel
     {
-        public event Func<(Vector2 position, Vector2 velocity)> GetRandomPositionAndVelocity;
-
         public readonly int CellsWidth;
         public readonly int CellsHeight;
 
@@ -62,11 +60,11 @@ namespace Model
             }
         }
 
-        private void AddRandomAsteroid(int id)
+        private void AddRandomAsteroid(int id, Func<Vector2> getRandomPosition, Func<Vector2> getRandomVelocity)
         {
             // Assert.IsNotNull(OnGetRandomPositionAndVelocity, "OnGetRandomPositionAndVelocity is null.");
-
-            (Vector2 position, Vector2 velocity) = GetRandomPositionAndVelocity();
+            Vector2 position = getRandomPosition();
+            Vector2 velocity = getRandomVelocity();
 
             AddAsteroid(position, velocity, id);
         }
@@ -118,44 +116,13 @@ namespace Model
                 _deltaTimes[id] += deltaTime;
         }
 
-        public void UpdateViewport(int xStart, int yStart, int xEnd, int yEnd)
-        {
-            for (int x = xStart; x < xEnd; x++)
-            {
-                for (int y = yStart; y < yEnd; y++)
-                {
-                    int[] asteroidIds = GetAsteroidIdsInCell(x, y);
-
-                    foreach (int id in asteroidIds)
-                    {
-                        if (id == -1)
-                        {
-                            break;
-                        }
-
-                        ProcessAsteroid(id);
-                    }
-                }
-            }
-        }
-
-        public void UpdatePart(int from, int to, int xStart, int yStart, int xEnd, int yEnd)
+        public void UpdatePart(int from, int to, Func<Vector2> getRandomPosition, Func<Vector2> getRandomVelocity)
         {
             for (int id = from; id < to; id++)
-            {
-                int cellX = _cellPositionsX[id];
-                int cellY = _cellPositionsY[id];
-
-                if (cellX >= xStart && cellX < xEnd && cellY >= yStart && cellY < yEnd)
-                {
-                    continue;
-                }
-
-                ProcessAsteroid(id);
-            }
+                ProcessAsteroid(id, getRandomPosition, getRandomVelocity);
         }
 
-        private void ProcessAsteroid(int id)
+        private void ProcessAsteroid(int id, Func<Vector2> getRandomPosition, Func<Vector2> getRandomVelocity)
         {
             float deltaTime = _deltaTimes[id];
 
@@ -169,7 +136,7 @@ namespace Model
             }
 
             if (!_isSpawned[id])
-                AddRandomAsteroid(id);
+                AddRandomAsteroid(id, getRandomPosition, getRandomVelocity);
 
             _deltaTimes[id] = 0f;
 
@@ -325,6 +292,16 @@ namespace Model
         public Vector2Int GetAsteroidCellPosition(int id)
         {
             return new Vector2Int(_cellPositionsX[id], _cellPositionsY[id]);
+        }
+
+        public Vector2 GetAsteroidVelocity(int id)
+        {
+            return new Vector2(_velocitiesX[id], _velocitiesY[id]);
+        }
+
+        public float GetDeltaTime(int id)
+        {
+            return _deltaTimes[id];
         }
 
         public void Destroy(int id)

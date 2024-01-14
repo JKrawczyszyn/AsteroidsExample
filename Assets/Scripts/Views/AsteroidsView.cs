@@ -80,7 +80,8 @@ namespace Views
             int xEnd = shipPositionX + _halfWidth;
             int yEnd = shipPositionY + _halfHeight;
 
-            AsteroidsController.Update(Time.deltaTime, xStart, yStart, xEnd, yEnd);
+            AsteroidsController.UpdateViewport(xStart, yStart, xEnd, yEnd);
+            AsteroidsController.Update(Time.deltaTime);
 
             _updatedInFrame.Clear();
 
@@ -121,7 +122,12 @@ namespace Views
                     break;
 
                 Vector2 localPosition = AsteroidsController.GetAsteroidLocalPosition(id);
-                Vector2 scenePosition = cellPosition + localPosition - ShipController.Position;
+                Vector2 velocity = AsteroidsController.GetAsteroidVelocity(id);
+                float deltaTime = AsteroidsController.GetDeltaTime(id);
+
+                Vector2 interpolatedPosition = localPosition + velocity * deltaTime;
+
+                Vector2 scenePosition = cellPosition + interpolatedPosition - ShipController.Position;
 
                 if (_asteroids.TryGetValue(id, out GameObject go))
                     go.transform.position = scenePosition;
@@ -131,6 +137,7 @@ namespace Views
                 yield return id;
             }
         }
+
 
         private void CreateAsteroid(int id, Vector2 scenePosition)
         {

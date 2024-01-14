@@ -60,7 +60,8 @@ namespace Views
         private void CreateControllers()
         {
             var asteroidsModel = new AsteroidsModel(_config);
-            AsteroidsController = new AsteroidsController(asteroidsModel, _config.Parts, _config.Seed);
+            var randomProvider = new RandomProvider(_config.GridSize.x, _config.GridSize.y);
+            AsteroidsController = new AsteroidsController(asteroidsModel, _config.Parts, _config.Seed, randomProvider);
             ShipController = new ShipController(_config, _config.GridSize / 2, Vector2.zero, Vector2.up);
         }
 
@@ -84,7 +85,6 @@ namespace Views
 
         private static void DestroyControllers()
         {
-            AsteroidsController.Dispose();
             ShipController.Dispose();
         }
     }
